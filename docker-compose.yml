@@ -1,5 +1,5 @@
 services:
-  jornadamilhas.api: &app  
+  jornadamilhas.api1: &app  
     image: ${DOCKER_REGISTRY-}jornadamilhasapi
     build:    
       context: .
