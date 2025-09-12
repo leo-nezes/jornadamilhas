@@ -1,0 +1,44 @@
+services:
+  jornadamilhas.api: &app  
+    image: ${DOCKER_REGISTRY-}jornadamilhasapi
+    build:    
+      context: .
+      dockerfile: /src/JornadaMilhas.API/Dockerfile
+    ports:
+      - '57398:8080'
+      - '57399:8081'
+    restart: unless-stopped
+    depends_on:
+      - sqlserver
+    networks:
+      - jornadamilhas-network
+
+  jornadamilhas.api2:
+     <<: *app
+     image: ${DOCKER_REGISTRY-}jornadamilhasapi:app2
+     ports:
+      - '57395:8080'
+      - '57396:8081'
+
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    hostname: 'sqlserver'
+    environment:
+      ACCEPT_EULA: 'Y'
+      MSSQL_SA_PASSWORD: "Alura#2024"
+    volumes:
+    - sql_data:/var/opt/mssql3
+    restart: unless-stopped
+    ports:
+      - '11433:1433'
+    expose:
+      - 1433
+    networks:
+      - jornadamilhas-network
+volumes:
+  sql_data:    
+
+networks:
+  jornadamilhas-network:
+    driver: bridge
