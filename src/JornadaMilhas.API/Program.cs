@@ -27,6 +27,11 @@ builder.Services.AddDbContext<JornadaMilhasContext>((options) => {
                 
 });
 
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration["ConnectionString:Redis"];
+});
+
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddEntityFrameworkStores<JornadaMilhasContext>()
     .AddDefaultTokenProviders();
@@ -36,6 +41,8 @@ builder.Services.AddTransient(typeof(EntityDAL<Rota>));
 builder.Services.AddTransient(typeof(OfertaViagemConverter));
 builder.Services.AddTransient(typeof(RotaConverter));
 builder.Services.AddTransient(typeof(PeriodoConverter));
+builder.Services.AddScoped<ICacheService, CacheService>();
+
 //Tratamento do Token
 builder.Services.AddTransient(typeof(GenerateToken));
 

@@ -3,7 +3,7 @@ services:
     image: ${DOCKER_REGISTRY-}jornadamilhasapi
     build:    
       context: .
-      dockerfile: /src/JornadaMilhas.API/Dockerfile
+      dockerfile: ./src/JornadaMilhas.API/Dockerfile
     ports:
       - '57398:8080'
       - '57399:8081'
@@ -36,6 +36,15 @@ services:
       - 1433
     networks:
       - jornadamilhas-network
+  redis: 
+    image: redis:7.2.4
+    restart: unless-stopped
+    networks:
+      - jornadamilhas-network
+    ports:
+      - '6379:6379'
+
+
 volumes:
   sql_data:    
 
