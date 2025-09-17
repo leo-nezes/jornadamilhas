@@ -55,7 +55,7 @@ public static class OfertaViagemExtensions
             return Results.Ok(converter.EntityToResponse(oferta));
         }).WithTags("Oferta Viagem").WithSummary("Obtem oferta de viagem por id.").WithOpenApi().RequireAuthorization();
 
-        app.MapDelete("/ofertas-viagem/{id}", async ([FromServices] OfertaViagemConverter converter, [FromServices] EntityDAL<OfertaViagem> entityDAL, int id) =>
+        app.MapDelete("/ofertas-viagem/{id}", async ([FromServices] OfertaViagemConverter converter, [FromServices] EntityDAL<OfertaViagem> entityDAL, [FromServices] ICacheService cacheService, int id) =>
         {
             var oferta = entityDAL.RecuperarPor(a => a.Id == id);
             if (oferta is null)
@@ -63,10 +63,11 @@ public static class OfertaViagemExtensions
                 return Results.NotFound($"Oferta com ID={id} para exclusão não encontrado.");
             }
             await entityDAL.Deletar(oferta);
+            await cacheService.InvalidateDataAsync(chaveCache);
             return Results.NoContent();
         }).WithTags("Oferta Viagem").WithSummary("Deleta uma oferta de viagem por id.").WithOpenApi().RequireAuthorization();
 
-        app.MapPut("/ofertas-viagem", async([FromServices] OfertaViagemConverter converter, [FromServices] EntityDAL<OfertaViagem> entityDAL, [FromBody] OfertaViagemEditRequest ofertaReq) =>
+        app.MapPut("/ofertas-viagem", async([FromServices] OfertaViagemConverter converter, [FromServices] EntityDAL<OfertaViagem> entityDAL, [FromBody] OfertaViagemEditRequest ofertaReq, [FromServices] ICacheService cacheService) =>
         {
            var ofertaAtualizada = entityDAL.RecuperarPor(a => a.Id == ofertaReq.Id);
             var ofertaConvertida = converter.RequestToEntity(ofertaReq);
@@ -77,6 +78,7 @@ public static class OfertaViagemExtensions
             ofertaAtualizada.Periodo = ofertaConvertida.Periodo;
             ofertaAtualizada.Preco = ofertaReq.preco;
             await entityDAL.Atualizar(ofertaAtualizada);
+            await cacheService.InvalidateDataAsync(chaveCache);
             return Results.NoContent();
 
         }).WithTags("Oferta Viagem").WithSummary("Atualiza uma oferta de viagem.").WithOpenApi().RequireAuthorization();

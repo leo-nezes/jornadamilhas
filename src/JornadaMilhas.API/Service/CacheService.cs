@@ -29,5 +29,10 @@ namespace JornadaMilhas.API.Service
 
             await cache.SetStringAsync(key, jsonData, options);
         }
+
+        public async Task InvalidateDataAsync(string key)
+        {
+            await cache.RemoveAsync(key);
+        }
     }
 }
